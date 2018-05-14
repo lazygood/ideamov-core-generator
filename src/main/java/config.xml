@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ideamov-config>
+	<property name="controller" >com.ideamov.action</property>
+	<property name="service"    >com.ideamov.core.service</property>
+	<property name="serviceImpl">com.ideamov.core.service.impl</property>
+	<property name="dao"        >com.ideamov.core.dao</property>
+	<property name="daoImpl"    >com.ideamov.core.dao.impl</property>
+    <property name="bean"       >com.ideamov.core.bean</property>
+	<property name="jsp"        >com.ideamov.page</property>
+</ideamov-config> 
