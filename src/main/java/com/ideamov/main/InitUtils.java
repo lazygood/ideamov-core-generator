@@ -15,7 +15,11 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
 import com.ideamov.utils.CharUtil;
-
+/**
+ *  工具初始化
+ * 2017-06-17
+ *  myt
+ */
 @SuppressWarnings("rawtypes")
 public class InitUtils {
 	
