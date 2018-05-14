@@ -15,11 +15,7 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
 import com.ideamov.utils.CharUtil;
-/**
- *  工具初始化
- * 2017-06-17
- *  myt
- */
+
 @SuppressWarnings("rawtypes")
 public class InitUtils {
 	
@@ -238,7 +234,7 @@ public class InitUtils {
 		         "public "+this.Name+" "+this.name+" = new "+this.Name+"();\r\n"+
 		         "\r\n"+
 		         "\r\n"+
-		         "\r\n"+
+		         "@RequiresPermissions(\""+this.name+":toQuery"+this.Name+"\")\r\n"+
 		         "public String toQuery"+Name+"() throws Exception {\r\n"+
 		         "\r\n"+
 		         "Map<Object, Object> map = "+this.name+"Service.query"+this.Name+"("+this.name+", pager, sorter);\r\n"+
@@ -250,6 +246,7 @@ public class InitUtils {
 		         "}\r\n"+
 		         "\r\n"+
 		         "\r\n"+
+		         "@RequiresPermissions(\""+this.name+":toView"+this.Name+"\")\r\n"+
 		         "public String toView"+Name+"(){\r\n"+
 		         "\r\n"+
 		         ""+this.name+" = "+this.name+"Service.get"+this.Name+"("+this.name+".getId());\r\n"+
@@ -263,6 +260,7 @@ public class InitUtils {
 		         "\r\n"+
 		      
 		         "\r\n"+
+		         "@RequiresPermissions(\""+this.name+":toEdit"+this.Name+"\")\r\n"+
 		         "public String toEdit"+Name+"() throws Exception{\r\n"+
 		         "\r\n"+
 		         "if(StringUtils.isNotBlank("+this.name+".getId())) "+this.name+" = "+this.name+"Service.get"+this.Name+"("+this.name+".getId());\r\n"+
@@ -274,6 +272,7 @@ public class InitUtils {
 		         "\r\n"+
 		         "\r\n"+
 		         "\r\n"+
+		         "@RequiresPermissions(\""+this.name+":edit"+this.Name+"\")\r\n"+
 		         "public String edit"+this.Name+"() throws Exception{\r\n"+
 		         "\r\n"+
 		         "if(StringUtils.isBlank("+this.name+".getId())) "+this.name+".setId(null);\r\n"+
@@ -291,6 +290,7 @@ public class InitUtils {
 		         "\r\n"+
 		         "\r\n"+
 		         "\r\n"+
+		         "@RequiresPermissions(\""+this.name+":delete"+Name+"\")\r\n"+
 		         "public String delete"+Name+"() throws Exception{\r\n"+
 		         "\r\n"+
 		         ""+this.name+"Service.delete"+this.Name+"("+this.name+".getId());\r\n"+
