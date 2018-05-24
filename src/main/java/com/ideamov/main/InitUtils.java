@@ -324,6 +324,7 @@ public class InitUtils {
 			bufferedWriter.write(
 					 "package "+packageName+";\r\n"+
 			         "import java.io.Serializable;\r\n"+
+					 "import java.util.Date;\r\n"+
 			         "import java.util.Map;\r\n"+
 			         "import "+this.packageName+"."+Name+";\r\n"+
 			         "import com.ideamov.util.page.Pager;\r\n"+
@@ -388,6 +389,7 @@ public class InitUtils {
 			         "public void edit"+Name+"("+Name+" "+name+") throws Exception{\r\n"+
 			         "//持久化保存\r\n"+
 			         " if(StringUtils.isBlank("+name+".getId())) {\r\n"+
+					 ""+name+".setCreateTime(new Date());\r\n"+
 			         ""+name+"Dao.save"+Name+"("+name+");\r\n"+
 			         "}\r\n"+
 			         "//持久化更新\r\n"+
@@ -846,7 +848,7 @@ public class InitUtils {
 			builder.append("").append("\r\n");	
 			builder.append("<hr />").append("\r\n");		 
 			builder.append("").append("\r\n");
-			builder.append("<div class=\"am-g\">").append("\r\n");	
+			builder.append("<div>").append("\r\n");	
 			builder.append("").append("\r\n");		 
 			builder.append("<div class=\"am-u-sm-12 am-u-md-4 am-u-md-push-8\" style=\"display: none;\" > <div class=\"am-panel am-panel-default\"> <div class=\"am-panel-bd\"> <div class=\"am-g\">  </div> </div></div></div>").append("\r\n");
 			builder.append("").append("\r\n");	
@@ -855,17 +857,37 @@ public class InitUtils {
 			builder.append("").append("\r\n");
 			for( int i=0;i<fieldEN.size();i++)
 			{
+			  //如果类属性命名为id 隐藏
 			  if("id".equals(fieldEN.get(i)))
 			  {
 				  builder.append("<div style=\"display: none;\"  class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldEN.get(i)+" </label><div class=\"am-u-sm-9\"><input type=\"text\"   name=\""+this.name+"."+fieldEN.get(i)+"\" placeholder=\"\"  value=\"${"+this.name+"."+fieldEN.get(i)+"}\"  ></div></div>").append("\r\n");  
 			  }
+			  //如果数据库字段命名为_time或_date新增日期控件
 			  else if(fieldDN.get(i).lastIndexOf("_time")>-1||fieldDN.get(i).lastIndexOf("_date")>-1)
 			  {
+				  //如果数据库字段命名为create_time编辑页面不显示
+				  if(!"create_time".equals(fieldDN.get(i)))
+				  {
 				  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\"><input type=\"text\"   name=\""+this.name+"."+fieldEN.get(i)+"\" placeholder=\"\"  value=\"${"+this.name+"."+fieldEN.get(i)+"}\" data-am-datepicker readonly required ></div></div>").append("\r\n");  
+				  }
 			  }
+			  else if("Integer".equals(fieldTyep.get(i)))
+			  {
+				  //如果是数据字典引入标签
+				  if(fieldDN.get(i).lastIndexOf("_state")>-1||fieldDN.get(i).lastIndexOf("_type")>-1)
+				  {
+				  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\">    <ideamov:select  code=\""+fieldDN.get(i).toUpperCase()+"\"  name=\""+this.name+"."+fieldEN.get(i)+"\" key=\"${"+this.name+"."+fieldEN.get(i)+"}\" /> </div></div>").append("\r\n");
+				  }
+				  //如果是普通数值
+				  else
+				  {
+			      builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\"><input type=\"text\"   name=\""+this.name+"."+fieldEN.get(i)+"\" placeholder=\"\"  value=\"${"+this.name+"."+fieldEN.get(i)+"}\"    pattern=\"^\\d{1,"+fieldLength.get(i)+"}$\" maxlength=\""+fieldLength.get(i)+"\" required ></div></div>").append("\r\n");
+				  }
+			  }
+			  //普通字符串
 			  else
 			  {
-			  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\"><input type=\"text\"   name=\""+this.name+"."+fieldEN.get(i)+"\" placeholder=\"\"  value=\"${"+this.name+"."+fieldEN.get(i)+"}\" required ></div></div>").append("\r\n");
+			  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\"><input type=\"text\"   name=\""+this.name+"."+fieldEN.get(i)+"\" placeholder=\"\"  value=\"${"+this.name+"."+fieldEN.get(i)+"}\" maxlength=\""+fieldLength.get(i)+"\" required ></div></div>").append("\r\n");
 			  }
 			}
 			builder.append("").append("\r\n");
