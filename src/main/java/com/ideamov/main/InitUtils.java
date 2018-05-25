@@ -821,6 +821,10 @@ public class InitUtils {
 	
 	public String getEditTemplate()
 	{
+		   
+		   List<String> Text = new ArrayList<String>();  //是否包含富文本编辑器，    默认： 否
+		   List<String> File = new ArrayList<String>();  //是否包含文件上传插件，    默认： 否
+		
 		 StringBuilder  builder = new StringBuilder();
 			
 			builder.append("<%@ page language=\"java\" contentType=\"text/html; charset=utf-8\" pageEncoding=\"utf-8\"%>").append("\r\n");
@@ -857,38 +861,66 @@ public class InitUtils {
 			builder.append("").append("\r\n");
 			for( int i=0;i<fieldEN.size();i++)
 			{
+			  //Type(String Double Integer Type )>Dn
 			  //如果类属性命名为id 隐藏
-			  if("id".equals(fieldEN.get(i)))
-			  {
-				  builder.append("<div style=\"display: none;\"  class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldEN.get(i)+" </label><div class=\"am-u-sm-9\"><input type=\"text\"   name=\""+this.name+"."+fieldEN.get(i)+"\" placeholder=\"\"  value=\"${"+this.name+"."+fieldEN.get(i)+"}\"  ></div></div>").append("\r\n");  
-			  }
-			  //如果数据库字段命名为_time或_date新增日期控件
-			  else if(fieldDN.get(i).lastIndexOf("_time")>-1||fieldDN.get(i).lastIndexOf("_date")>-1)
-			  {
-				  //如果数据库字段命名为create_time编辑页面不显示
-				  if(!"create_time".equals(fieldDN.get(i)))
-				  {
-				  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\"><input type=\"text\"   name=\""+this.name+"."+fieldEN.get(i)+"\" placeholder=\"\"  value=\"${"+this.name+"."+fieldEN.get(i)+"}\" data-am-datepicker readonly required ></div></div>").append("\r\n");  
-				  }
-			  }
-			  else if("Integer".equals(fieldTyep.get(i)))
-			  {
-				  //如果是数据字典引入标签
-				  if(fieldDN.get(i).lastIndexOf("_state")>-1||fieldDN.get(i).lastIndexOf("_type")>-1)
-				  {
-				  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\">    <ideamov:select  code=\""+fieldDN.get(i).toUpperCase()+"\"  name=\""+this.name+"."+fieldEN.get(i)+"\" key=\"${"+this.name+"."+fieldEN.get(i)+"}\" /> </div></div>").append("\r\n");
-				  }
-				  //如果是普通数值
-				  else
-				  {
-			      builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\"><input type=\"text\"   name=\""+this.name+"."+fieldEN.get(i)+"\" placeholder=\"\"  value=\"${"+this.name+"."+fieldEN.get(i)+"}\"    pattern=\"^\\d{1,"+fieldLength.get(i)+"}$\" maxlength=\""+fieldLength.get(i)+"\" required ></div></div>").append("\r\n");
-				  }
-			  }
-			  //普通字符串
-			  else
-			  {
-			  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\"><input type=\"text\"   name=\""+this.name+"."+fieldEN.get(i)+"\" placeholder=\"\"  value=\"${"+this.name+"."+fieldEN.get(i)+"}\" maxlength=\""+fieldLength.get(i)+"\" required ></div></div>").append("\r\n");
-			  }
+				String T  = fieldTyep.get(i);//java类型
+				String EN = fieldEN.get(i);//英文名
+				String CN = fieldCN.get(i);//中文名
+				String DN = fieldDN.get(i);//数据库字段名
+				String DS = fieldLength.get(i);//数据库字段长度
+				
+			    if("String".equals(T))
+			    {
+				      //如果为id(主键)隐藏文本框
+					  if("id".equals(EN))
+					  {
+						  builder.append("<div style=\"display: none;\"  class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+EN+" </label><div class=\"am-u-sm-9\"><input type=\"text\"   name=\""+this.name+"."+EN+"\" placeholder=\"\"  value=\"${"+this.name+"."+EN+"}\"  ></div></div>").append("\r\n");  
+					  }
+					  //如果数据库字段命名包含_text引入富文本编辑器
+					  else if(fieldDN.get(i).lastIndexOf("_text")>-1)
+					  {
+						  Text.add(this.name+"_"+EN);
+						  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\"> <textarea rows=\"10\" id=\""+this.name+"_"+EN+"\"  name=\""+this.name+"."+EN+"\" style=\"style=\"width: 105%;height: 300px\"\" > ${"+this.name+"."+EN+"} </textarea> </div></div>").append("\r\n");
+					  }
+					  //如果数据库字段命名包含_url引入文件上传插件
+					  else if(fieldDN.get(i).lastIndexOf("_url")>-1)
+					  {
+						  File.add(this.name+"_"+EN);
+						  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\">  <input id=\"up_"+this.name+"_"+EN+"\" type=\"file\" name=\"file\" class=\"am-input-sm\" accept=\".jpg,.png\" style=\"margin-top: 11px;\" form=\"upFrom_"+this.name+"_"+EN+"\"> <input id=\"upInput_"+this.name+"_"+EN+"\" type=\"hidden\" name=\""+this.name+"."+EN+"\" value=\"${"+this.name+"."+EN+"}\"> </div></div>").append("\r\n");
+						  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\"> </label><div class=\"am-u-sm-9\">  <img id=\"upImage_"+this.name+"_"+EN+"\" style=\"width: 300px; height: 200px\" src=\"${"+this.name+"."+EN+"}\" alt=\"无图片显示\"> </div></div>").append("\r\n");
+					  }
+					  else
+					  {
+					  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\"><input type=\"text\"   name=\""+this.name+"."+EN+"\" placeholder=\"\"  value=\"${"+this.name+"."+EN+"}\" maxlength=\""+DS+"\" required ></div></div>").append("\r\n");
+					  }
+			    }else if ("Integer".equals(T))
+			    {
+					  //如果是数据字典引入标签
+					  if(fieldDN.get(i).lastIndexOf("_state")>-1||fieldDN.get(i).lastIndexOf("_type")>-1)
+					  {
+					  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\">    <ideamov:select  code=\""+DN.toUpperCase()+"\"  name=\""+this.name+"."+EN+"\" key=\"${"+this.name+"."+EN+"}\" /> </div></div>").append("\r\n");
+					  }
+					  //如果是普通数值
+					  else
+					  {
+				      builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\"><input type=\"text\"   name=\""+this.name+"."+EN+"\" placeholder=\"\"  value=\"${"+this.name+"."+EN+"}\"    pattern=\"^\\d{1,"+DS+"}$\" maxlength=\""+fieldLength.get(i)+"\" required ></div></div>").append("\r\n");
+					  }
+			    }else if ("Date".equals(T))
+			    {
+					  //如果数据库字段命名为create_time编辑页面不显示
+					  if(!"create_time".equals(DN))
+					  {
+					  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+CN+" </label><div class=\"am-u-sm-9\"><input type=\"text\"   name=\""+this.name+"."+EN+"\" placeholder=\"\"  value=\"<fmt:formatDate value=\"${"+this.name+"."+EN+"}\" pattern=\"yyyy-MM-dd\"/>\" data-am-datepicker readonly required ></div></div>").append("\r\n");  
+					  }
+			    }else if ("Double".equals(T))
+			    {
+			    	  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\"><input type=\"text\"   name=\""+this.name+"."+EN+"\" placeholder=\"\"  value=\"${"+this.name+"."+EN+"}\" maxlength=\""+DS+"\" required ></div></div>").append("\r\n");
+			    }
+			    else
+			    {
+				   
+			    }
+			  
 			}
 			builder.append("").append("\r\n");
 			builder.append("<div class=\"am-form-group\"> <div class=\"am-u-sm-6 am-u-sm-push-6\"><button type=\"submit\" class=\"am-btn am-btn-primary\">提交保存</button></div></div>").append("\r\n");	
@@ -896,13 +928,45 @@ public class InitUtils {
 			
 			builder.append("</div>").append("\r\n");
 			builder.append("</div>").append("\r\n");	
-			builder.append("</form>").append("\r\n");		 
+			builder.append("</form>").append("\r\n");		
+            //如果包含文件上传插件,加载表单			
+			if(File.size()>0)
+			{
+				for(String fileId : File)
+				{
+				builder.append("<form action=\"${path}/"+this.name.toLowerCase()+"/upload\" method=\"post\" id=\"upFrom_"+fileId+"\" enctype=\"multipart/form-data\"></form>").append("\r\n");
+				}
+			}
 			builder.append("</div>").append("\r\n");
 			builder.append("").append("\r\n");	
 			builder.append("<%-- 右部内容   -结束  --%>").append("\r\n");
 			builder.append("</div>").append("\r\n");
 			builder.append("").append("\r\n");
 			builder.append("<%-- 页面底部    --%><%@include file=\"../common/footer.jsp\"%>").append("\r\n");
+            //如果包含富文本编辑器,加载样式			
+			if(Text.size()>0)
+			{
+				builder.append("<!-- UM配置文件、编辑器源码文件、样式 -->").append("\r\n");
+				builder.append("<link href=\"${path }/res/assets/umeditor/themes/default/css/umeditor.css\" type=\"text/css\" rel=\"stylesheet\">").append("\r\n");
+				builder.append("<script type=\"text/javascript\" src=\"${path }/res/assets/umeditor/third-party/template.min.js\"></script>").append("\r\n");
+				builder.append("<script type=\"text/javascript\" src=\"${path }/res/assets/umeditor/umeditor.config.js\" charset=\"utf-8\"></script>").append("\r\n");
+				builder.append("<script type=\"text/javascript\" src=\"${path }/res/assets/umeditor/umeditor.min.js\" charset=\"utf-8\"></script>").append("\r\n");
+				builder.append("<script type=\"text/javascript\" src=\"${path }/res/assets/umeditor/lang/zh-cn/zh-cn.js\"></script>").append("\r\n");
+				builder.append("<script type=\"text/javascript\"> function ueEditorInit(obj) { var editor = UM.getEditor(obj); } </script>").append("\r\n");
+				for(String textId : Text)
+				{
+					builder.append("<script type=\"text/javascript\"> $(function() { ueEditorInit('"+textId+"'); }); </script>").append("\r\n");
+				}
+				
+			}
+            //如果包含文件上传插件,初始化参数			
+			if(File.size()>0)
+			{
+				for(String fileId : File)
+				{
+					builder.append("<script type=\"text/javascript\"> $(\"#up_"+fileId+"\").change(function() { myConfig.file.upload(\"upFrom_"+fileId+"\", \"upInput_"+fileId+"\", \"upImage_"+fileId+"\"); }); </script>").append("\r\n");
+				}
+			}
 			builder.append("").append("\r\n");
 			builder.append("</body>").append("\r\n");
 			builder.append("</html>").append("\r\n");
