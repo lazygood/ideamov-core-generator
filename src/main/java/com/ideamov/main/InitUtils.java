@@ -234,7 +234,7 @@ public class InitUtils {
 		         "public "+this.Name+" "+this.name+" = new "+this.Name+"();\r\n"+
 		         "\r\n"+
 		         "\r\n"+
-		         "@RequiresPermissions(\""+this.name+":toQuery"+this.Name+"\")\r\n"+
+		         "//@RequiresPermissions(\""+this.name+":toQuery"+this.Name+"\")\r\n"+
 		         "public String toQuery"+Name+"() throws Exception {\r\n"+
 		         "\r\n"+
 		         "Map<Object, Object> map = "+this.name+"Service.query"+this.Name+"("+this.name+", pager, sorter);\r\n"+
@@ -246,7 +246,7 @@ public class InitUtils {
 		         "}\r\n"+
 		         "\r\n"+
 		         "\r\n"+
-		         "@RequiresPermissions(\""+this.name+":toView"+this.Name+"\")\r\n"+
+		         "//@RequiresPermissions(\""+this.name+":toView"+this.Name+"\")\r\n"+
 		         "public String toView"+Name+"(){\r\n"+
 		         "\r\n"+
 		         ""+this.name+" = "+this.name+"Service.get"+this.Name+"("+this.name+".getId());\r\n"+
@@ -260,7 +260,7 @@ public class InitUtils {
 		         "\r\n"+
 		      
 		         "\r\n"+
-		         "@RequiresPermissions(\""+this.name+":toEdit"+this.Name+"\")\r\n"+
+		         "//@RequiresPermissions(\""+this.name+":toEdit"+this.Name+"\")\r\n"+
 		         "public String toEdit"+Name+"() throws Exception{\r\n"+
 		         "\r\n"+
 		         "if(StringUtils.isNotBlank("+this.name+".getId())) "+this.name+" = "+this.name+"Service.get"+this.Name+"("+this.name+".getId());\r\n"+
@@ -272,7 +272,7 @@ public class InitUtils {
 		         "\r\n"+
 		         "\r\n"+
 		         "\r\n"+
-		         "@RequiresPermissions(\""+this.name+":edit"+this.Name+"\")\r\n"+
+		         "//@RequiresPermissions(\""+this.name+":edit"+this.Name+"\")\r\n"+
 		         "public String edit"+this.Name+"() throws Exception{\r\n"+
 		         "\r\n"+
 		         "if(StringUtils.isBlank("+this.name+".getId())) "+this.name+".setId(null);\r\n"+
@@ -290,7 +290,7 @@ public class InitUtils {
 		         "\r\n"+
 		         "\r\n"+
 		         "\r\n"+
-		         "@RequiresPermissions(\""+this.name+":delete"+Name+"\")\r\n"+
+		         "//@RequiresPermissions(\""+this.name+":delete"+Name+"\")\r\n"+
 		         "public String delete"+Name+"() throws Exception{\r\n"+
 		         "\r\n"+
 		         ""+this.name+"Service.delete"+this.Name+"("+this.name+".getId());\r\n"+
@@ -506,6 +506,7 @@ public class InitUtils {
 				 "package "+packageName+";\r\n"+
 		         "import "+this.packageName+"."+Name+";\r\n"+
 		         "import com.ideamov.util.page.AbstractHQLCriterior;\r\n"+
+				 "import org.apache.commons.lang.StringUtils;\r\n"+
 		         "import com.ideamov.util.page.Pager;\r\n"+
 		         "import com.ideamov.util.page.Sorter;\r\n"+
 		         "\r\n"+
@@ -524,6 +525,8 @@ public class InitUtils {
 		         "\r\n"+
 		         "if (queryModel != null) {\r\n"+
 		         "\r\n"+
+		         "if (StringUtils.isNotBlank(queryModel.getId())) { super.hql.append(\" and o.id =  ? \"); super.argValues.add(queryModel.getId());}\r\n"+
+		         "\r\n"+
 		         "}\r\n"+
 		         "\r\n"+
 		         "if (null != sorters) {\r\n"+
@@ -531,7 +534,7 @@ public class InitUtils {
 		         "for (Sorter s : sorters) {\r\n"+
 		         "super.hql.append(\" o.\" + s.getSort() + \" \" + s.getOrder() + \" \");\r\n"+
 		         "}\r\n"+
-		         "}\r\n"+
+		         "}else { super.hql.append(\" order by  o.createTime  desc \"); }\r\n"+
 		         "}\r\n"+
 		         "\r\n"+
 		         "\r\n"+
@@ -1016,7 +1019,7 @@ public class InitUtils {
 			builder.append("").append("\r\n");
 			builder.append("<div class=\"am-u-sm-12 am-u-md-3\">").append("\r\n");
 			builder.append("<div class=\"am-input-group am-input-group-sm\">").append("\r\n");
-			builder.append("<input type=\"text\" name="+this.name+".id\" class=\"am-form-field\" placeholder=\"\" value=\"${"+this.name+".id }\" >").append("\r\n");
+			builder.append("<input type=\"text\" name="+this.name+".id\" class=\"am-form-field\" placeholder=\"id查询\" value=\"${"+this.name+".id }\" >").append("\r\n");
 			builder.append("<span class=\"am-input-group-btn\"> <button class=\"am-btn am-btn-default\" type=\"button\" onclick=\"myConfig.page.go('${path}/"+this.name+"/toQuery"+this.Name+"','1','${param.pmenu }');\" >搜索</button></span>").append("\r\n");
 			builder.append("</div>").append("\r\n");
 			builder.append("</div>").append("\r\n");
@@ -1044,9 +1047,27 @@ public class InitUtils {
 			builder.append("<c:forEach items=\"${map.rows}\" var=\"row\">").append("\r\n");
 			builder.append("<tr>").append("\r\n");
 			
-			for(String field:this.fieldEN)
+			for(int i =0 ;i<this.fieldEN.size();i++)
 			{
-				builder.append("<td>${row."+field+"}</td>");
+				  //Type(String Double Integer Type )>Dn
+				  //如果类属性命名为id 隐藏
+				String T  = fieldTyep.get(i);//java类型
+				String EN = fieldEN.get(i);//英文名
+				String CN = fieldCN.get(i);//中文名
+				String DN = fieldDN.get(i);//数据库字段名
+				String DS = fieldLength.get(i);//数据库字段长度
+			    if(EN.lastIndexOf("Date")>-1||EN.lastIndexOf("Time")>-1)
+			    {
+				builder.append("<td><fmt:formatDate value=\"${row."+EN+"}\" pattern=\"yyyy-MM-dd\"/></td>");
+			    }
+			    else if(EN.lastIndexOf("Type")>-1||EN.lastIndexOf("State")>-1)
+			    {
+			    builder.append("<td><ideamov:text  code=\""+DN.toUpperCase()+"\" key=\"${row."+EN+"}\" /></td>");	
+			    }
+			    else
+			    {
+			    builder.append("<td>${row."+EN+"}</td>");	
+			    }
 			}
 			
 			builder.append("<td>").append("\r\n");
