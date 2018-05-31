@@ -321,7 +321,7 @@ public class InitUtils {
 		         "List<Map<String, Object>> cols = new ArrayList<Map<String, Object>>();\r\n"+
 		         "List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();\r\n"+
 		         "		for (Field field : "+this.Name+".class.getDeclaredFields()) { Map<String, Object> col = new HashMap<String, Object>();col.put(\"name\", field.getName());cols.add(col);}\r\n"+
-		         "for (Demo demo : list) { rows.add(BeanUtils.describe(demo)); }\r\n"+
+		         "for ("+this.Name+" "+this.name+" : list) { rows.add(BeanUtils.describe("+this.name+")); }\r\n"+
 		         "		POIUtils.exportToExcel(this.getResponse(), cols, rows, \""+this.Name+"\" + new SimpleDateFormat(\"yyyyMMddHHmmss\").format(new Date()));\r\n"+
 		         "\r\n"+
 		         "}\r\n"+
