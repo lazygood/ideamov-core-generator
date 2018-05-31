@@ -216,6 +216,16 @@ public class InitUtils {
 				 "package "+packageName+"."+this.lowerName+";\r\n"+
 		         "import java.util.Map;\r\n"+
 		         "import "+this.packageName+"."+Name+";\r\n"+
+		         "import java.util.ArrayList;\r\n"+
+		         "import java.util.Date;\r\n"+
+		         "import java.util.HashMap;\r\n"+
+		         "import java.util.List;\r\n"+
+		         "import com.ideamov.util.page.PagerUtil;\r\n"+
+		         "import com.ideamov.util.poi.POIUtils;\r\n"+
+		         "import org.apache.commons.beanutils.BeanUtils;\r\n"+
+		         "import org.apache.commons.lang3.StringUtils;\r\n"+
+		         "import java.lang.reflect.Field;\r\n"+
+		         "import java.text.SimpleDateFormat;\r\n"+
 		         "import javax.annotation.Resource;\r\n"+
 		         "import org.springframework.context.annotation.Scope;\r\n"+
 		         "import org.springframework.stereotype.Controller;\r\n"+
@@ -301,7 +311,22 @@ public class InitUtils {
 		         "\r\n"+
 		         "}\r\n"+
 		         "\r\n"+
-		  
+		         "\r\n"+
+		         "\r\n"+
+		         "//@RequiresPermissions(\""+this.name+":export"+Name+"\")\r\n"+
+		         "public void export"+Name+"() throws Exception{\r\n"+
+		         "pager.setSize(0);\r\n"+
+		         "Map<Object, Object> map = "+this.name+"Service.query"+this.Name+"("+this.name+", pager, sorter);\r\n"+
+		         "List<"+this.Name+"> list = (List<"+this.Name+">) map.get(PagerUtil.DATA_COLLECTION_KEY);\r\n"+
+		         "List<Map<String, Object>> cols = new ArrayList<Map<String, Object>>();\r\n"+
+		         "List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();\r\n"+
+		         "		for (Field field : "+this.Name+".class.getDeclaredFields()) { Map<String, Object> col = new HashMap<String, Object>();col.put(\"name\", field.getName());cols.add(col);}\r\n"+
+		         "for (Demo demo : list) { rows.add(BeanUtils.describe(demo)); }\r\n"+
+		         "		POIUtils.exportToExcel(this.getResponse(), cols, rows, \""+this.Name+"\" + new SimpleDateFormat(\"yyyyMMddHHmmss\").format(new Date()));\r\n"+
+		         "\r\n"+
+		         "}\r\n"+
+		         "\r\n"+
+		         "\r\n"+
 		         "\r\n"+
 		          "}"); 
 		
@@ -679,7 +704,7 @@ public class InitUtils {
          "		return this.getAll"+Name+"();\r\n"+
          "\r\n"+
          "		}\r\n"+
-         "\r\n"+
+         "@SuppressWarnings(\"unchecked\")\r\n"+
          "	 public Map<Object, Object> pageList("+this.Name+" "+this.name+", Pager pager, Sorter[] sorters) throws Exception{\r\n"+
          "\r\n"+
          "   "+this.Name+"Criterior criterior = new "+this.Name+"Criterior("+this.name+", sorters, pager);\r\n"+
@@ -1020,7 +1045,7 @@ public class InitUtils {
 			builder.append("<div class=\"am-u-sm-12 am-u-md-3\">").append("\r\n");
 			builder.append("<div class=\"am-input-group am-input-group-sm\">").append("\r\n");
 			builder.append("<input type=\"text\" name="+this.name+".id\" class=\"am-form-field\" placeholder=\"id查询\" value=\"${"+this.name+".id }\" >").append("\r\n");
-			builder.append("<span class=\"am-input-group-btn\"> <button class=\"am-btn am-btn-default\" type=\"button\" onclick=\"myConfig.page.go('${path}/"+this.name+"/toQuery"+this.Name+"','1','${param.pmenu }');\" >搜索</button></span>").append("\r\n");
+			builder.append("<span class=\"am-input-group-btn\"> <button class=\"am-btn am-btn-default\" type=\"button\" onclick=\"myConfig.page.go('${path}/"+this.name+"/toQuery"+this.Name+"','1','${param.pmenu }');\" >搜索</button> <button class=\"am-btn am-btn-default\" type=\"button\" onclick=\"myConfig.page.import('${path}/"+this.name+"/export"+this.Name+"');\">导出</button></span>").append("\r\n");
 			builder.append("</div>").append("\r\n");
 			builder.append("</div>").append("\r\n");
 			builder.append("</form>").append("\r\n");
