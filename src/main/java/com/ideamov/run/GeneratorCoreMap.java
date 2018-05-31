@@ -64,11 +64,11 @@ public class GeneratorCoreMap {
 		 * 生成相应包名
 		 */
 		System.out.println(classMessages);
-
+		System.out.println("扫描匹配JavaBean文件数:"+classMessages.size());
 		for (ClassPathMessage classMessage : classMessages) {
 			new InitUtils(Class.forName(classMessage.getClassName()),classMessage.getClassHbmXmlUrl());
 		}
-
+		System.out.println("OVER");
 		// new InitUtils(Class.forName("com.ideamov.core.bean.demo.Demo"));
 
 	}
