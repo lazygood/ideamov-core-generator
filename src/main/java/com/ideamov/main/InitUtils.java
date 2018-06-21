@@ -141,10 +141,11 @@ public class InitUtils {
 		         "import org.springframework.context.annotation.Scope;\r\n"+
 		         "import org.springframework.stereotype.Controller;\r\n"+
 		         "import com.ideamov.common.web.action.BaseAction;\r\n"+
+		         "import com.google.gson.Gson; import com.ideamov.common.web.exception.MyException; import com.ideamov.common.web.fiter.ExceptionInterceptor;\r\n"+
 		         "import "+Package.PACKAGE.get(Package.SERVICE_KEY)+"."+Name+"Service;\r\n"+
 		         "import org.apache.commons.lang3.StringUtils;\r\n"+
 		         "\r\n"+
-		         "@SuppressWarnings(\"serial\")\r\n"+
+		         "@SuppressWarnings({ \"serial\", \"rawtypes\" })\r\n"+
 		         "@Scope(\"property\")\r\n"+
 		         "@Controller\r\n"+
 		         "public class "+Name+"Ajax extends BaseAction{\r\n"+
@@ -155,7 +156,26 @@ public class InitUtils {
 		         "public "+this.Name+" "+this.name+" = new "+this.Name+"();\r\n"+
 		         "\r\n"+
 		         "\r\n"+
+		         "public void toQuery"+this.Name+"() throws Exception {\r\n"+
+		         "Map<Object, Object> map = "+this.name+"Service.query"+this.Name+"("+this.name+", pager, sorter); this.utf8Response().getWriter().write(this.getGsonTime().toJson(map));\r\n"+
+		         "}\r\n"+
+		         "\r\n"+
+		         "public void add"+this.Name+"() throws Exception {\r\n"+
+		         "if (StringUtils.isBlank("+this.name+".getId())) throw new MyException(\"id必须为空\"); "+this.name+"Service.edit"+this.Name+"("+this.name+"); Map result = ExceptionInterceptor.getSuccessMap(); this.utf8Response().getWriter().write(new Gson().toJson(result));\r\n"+
+		         "}\r\n"+
+		         "\r\n"+
+		         "public void updateDemo() throws Exception {\r\n"+
+		         "if (StringUtils.isBlank("+this.name+".getId())) throw new MyException(\"id不能空\"); "+this.name+"Service.edit"+this.Name+"("+this.name+"); Map result = ExceptionInterceptor.getSuccessMap(); this.utf8Response().getWriter().write(new Gson().toJson(result));\r\n"+
+		         "}\r\n"+
+		         "\r\n"+
+		         "public void delete"+this.Name+"() throws Exception {\r\n"+
+		         "if (StringUtils.isBlank("+this.name+".getId())) "+this.name+".setId(null); "+this.name+"Service.delete"+this.Name+"("+this.name+".getId()); Map result = ExceptionInterceptor.getSuccessMap(); this.utf8Response().getWriter().write(new Gson().toJson(result));\r\n"+
+		         "}\r\n"+
+		         "\r\n"+
 		          "}"); 
+		
+		
+	 
 		
 		bufferedWriter.flush();
 		bufferedWriter.close();
@@ -359,6 +379,7 @@ public class InitUtils {
 			         "import org.apache.commons.lang3.StringUtils;"+
 			         "import org.springframework.stereotype.Service;\r\n"+
 			         "import org.springframework.transaction.annotation.Transactional;\r\n"+
+			         "import com.ideamov.common.web.exception.MyException;\r\n"+
 			         "import "+Package.PACKAGE.get(Package.DAO_KEY)+"."+Name+"Dao;\r\n"+
 			         "import "+Package.PACKAGE.get(Package.SERVICE_KEY)+"."+Name+"Service;\r\n"+
 			         "\r\n"+
@@ -411,11 +432,12 @@ public class InitUtils {
 			         "\r\n"+
 			         "\r\n"+
 			         "\r\n"+
-			         "public void edit"+Name+"("+Name+" "+name+") throws Exception{\r\n"+
+			         "public "+Name+" edit"+Name+"("+Name+" "+name+") throws Exception{\r\n"+
 			         "//持久化保存\r\n"+
 			         " if(StringUtils.isBlank("+name+".getId())) {\r\n"+
 					 ""+name+".setCreateTime(new Date());\r\n"+
 			         ""+name+"Dao.save"+Name+"("+name+");\r\n"+
+			         "return "+name+";\r\n"+
 			         "}\r\n"+
 			         "//持久化更新\r\n"+
 			         "else\r\n"+
@@ -423,7 +445,10 @@ public class InitUtils {
 			         ""+Name+" local = "+name+"Dao.get"+Name+"ById("+name+".getId());\r\n"+
 			         "//选择持久化快照需要更新的字段\r\n"+
 			         "\r\n"+
+			         "			if (local == null) { throw new MyException(\"无效id\"); }\r\n"+
+			         "\r\n"+
 			         "\r\n"+this.editField()+
+			         "return local;\r\n"+
 			         "\r\n"+
 			         "}\r\n"+
 			         "\r\n"+
@@ -506,7 +531,7 @@ public class InitUtils {
 		         "void update"+Name+"("+Name+" "+name+") throws Exception;\r\n"+
 		         "\r\n"+
 		         "\r\n"+
-		         "void edit"+Name+"("+Name+" "+name+") throws Exception;\r\n"+
+		         ""+Name+" edit"+Name+"("+Name+" "+name+") throws Exception;\r\n"+
 		         "\r\n"+
 		          "}"); 
 
