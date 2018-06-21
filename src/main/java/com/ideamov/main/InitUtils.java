@@ -145,7 +145,7 @@ public class InitUtils {
 		         "import "+Package.PACKAGE.get(Package.SERVICE_KEY)+"."+Name+"Service;\r\n"+
 		         "import org.apache.commons.lang3.StringUtils;\r\n"+
 		         "\r\n"+
-		         "@SuppressWarnings({ \"serial\", \"rawtypes\" })\r\n"+
+		         "@SuppressWarnings({ \"serial\", \"rawtypes\", \"unchecked\" })\r\n"+
 		         "@Scope(\"property\")\r\n"+
 		         "@Controller\r\n"+
 		         "public class "+Name+"Ajax extends BaseAction{\r\n"+
@@ -161,7 +161,7 @@ public class InitUtils {
 		         "}\r\n"+
 		         "\r\n"+
 		         "public void add"+this.Name+"() throws Exception {\r\n"+
-		         "if (StringUtils.isBlank("+this.name+".getId())) throw new MyException(\"id必须为空\"); "+this.name+"Service.edit"+this.Name+"("+this.name+"); Map result = ExceptionInterceptor.getSuccessMap(); this.utf8Response().getWriter().write(new Gson().toJson(result));\r\n"+
+		         "if (StringUtils.isNotBlank("+this.name+".getId())) throw new MyException(\"id必须为空\"); "+this.name+"Service.edit"+this.Name+"("+this.name+"); Map result = ExceptionInterceptor.getSuccessMap(); result.put(\"id\", " + this.name+ ".getId());  this.utf8Response().getWriter().write(new Gson().toJson(result));\r\n"+
 		         "}\r\n"+
 		         "\r\n"+
 		         "public void updateDemo() throws Exception {\r\n"+
