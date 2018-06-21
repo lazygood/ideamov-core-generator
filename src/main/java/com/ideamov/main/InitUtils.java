@@ -251,9 +251,8 @@ public class InitUtils {
 		         "import org.springframework.stereotype.Controller;\r\n"+
 		         "import com.ideamov.common.web.action.BaseAction;\r\n"+
 		         "import "+Package.PACKAGE.get(Package.SERVICE_KEY)+"."+Name+"Service;\r\n"+
-		         "import org.apache.commons.lang3.StringUtils;\r\n"+
 		         "\r\n"+
-		         "@SuppressWarnings(\"serial\")\r\n"+
+		         "@SuppressWarnings({\"serial\",\"unchecked\"})\r\n"+
 		         "@Scope(\"property\")\r\n"+
 		         "@Controller\r\n"+
 		         "public class "+Name+"Action extends BaseAction{\r\n"+
