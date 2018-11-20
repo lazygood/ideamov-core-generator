@@ -896,7 +896,7 @@ public class InitUtils {
 			builder.append("<%-- 右部内容   -开始   --%>").append("\r\n");
 			builder.append("").append("\r\n");		 
 			builder.append("<div id=\"admin-content\" class=\"admin-content\">").append("\r\n");	
-			builder.append("<form class=\"am-form am-form-horizontal\"  method=\"post\" action=\"${path}/"+this.name.toLowerCase()+"/edit"+this.Name+".action\"  data-am-validator >").append("\r\n");	
+			builder.append("<form class=\"am-form am-form-horizontal\"  method=\"post\" action=\"${path}/"+this.lowerName+"/edit"+this.Name+".action\"  data-am-validator >").append("\r\n");	
 			builder.append("").append("\r\n");	
 			builder.append("<input type=\"hidden\"  name=\"backUrl\"  value=\"${backUrl }\" >").append("\r\n");	
 			builder.append("").append("\r\n");	
@@ -986,7 +986,7 @@ public class InitUtils {
 			{
 				for(String fileId : File)
 				{
-				builder.append("<form action=\"${path}/"+this.name.toLowerCase()+"/upload\" method=\"post\" id=\"upFrom_"+fileId+"\" enctype=\"multipart/form-data\"></form>").append("\r\n");
+				builder.append("<form action=\"${path}/"+this.lowerName+"/upload\" method=\"post\" id=\"upFrom_"+fileId+"\" enctype=\"multipart/form-data\"></form>").append("\r\n");
 				}
 			}
 			builder.append("</div>").append("\r\n");
@@ -1061,7 +1061,7 @@ public class InitUtils {
 			builder.append("<div class=\"am-u-sm-12 am-u-md-7\">").append("\r\n");
 			builder.append("<div class=\"am-btn-toolbar\">").append("\r\n");
 			builder.append("<div class=\"am-btn-group am-btn-group-xs\">").append("\r\n");
-			builder.append("<button  type=\"button\"  class=\"am-btn am-btn-default\" onclick=\"myConfig.page.edit('${path}/"+this.name+"/toEdit"+this.Name+".action?"+this.name+".id=${row.id}&pager.num=${map.pager.num}&pmenu=${param.pmenu }')\" ><span class=\"am-icon-plus\"></span>新增</button>").append("\r\n");
+			builder.append("<button  type=\"button\"  class=\"am-btn am-btn-default\" onclick=\"myConfig.page.edit('${path}/"+this.lowerName+"/toEdit"+this.Name+".action?"+this.name+".id=${row.id}&pager.num=${map.pager.num}&pmenu=${param.pmenu }')\" ><span class=\"am-icon-plus\"></span>新增</button>").append("\r\n");
 			builder.append("</div>").append("\r\n");
 			builder.append("</div>").append("\r\n");
 			builder.append("</div>").append("\r\n");
@@ -1069,7 +1069,7 @@ public class InitUtils {
 			builder.append("<div class=\"am-u-sm-12 am-u-md-3\">").append("\r\n");
 			builder.append("<div class=\"am-input-group am-input-group-sm\">").append("\r\n");
 			builder.append("<input type=\"text\" name="+this.name+".id\" class=\"am-form-field\" placeholder=\"id查询\" value=\"${"+this.name+".id }\" >").append("\r\n");
-			builder.append("<span class=\"am-input-group-btn\"> <button class=\"am-btn am-btn-default\" type=\"button\" onclick=\"myConfig.page.go('${path}/"+this.name+"/toQuery"+this.Name+"','1','${param.pmenu }');\" >搜索</button> <button class=\"am-btn am-btn-default\" type=\"button\" onclick=\"myConfig.page.import('${path}/"+this.name+"/export"+this.Name+"');\">导出</button></span>").append("\r\n");
+			builder.append("<span class=\"am-input-group-btn\"> <button class=\"am-btn am-btn-default\" type=\"button\" onclick=\"myConfig.page.go('${path}/"+this.lowerName+"/toQuery"+this.Name+"','1','${param.pmenu }');\" >搜索</button> <button class=\"am-btn am-btn-default\" type=\"button\" onclick=\"myConfig.page.import('${path}/"+this.lowerName+"/export"+this.Name+"');\">导出</button></span>").append("\r\n");
 			builder.append("</div>").append("\r\n");
 			builder.append("</div>").append("\r\n");
 			builder.append("</form>").append("\r\n");
@@ -1122,8 +1122,8 @@ public class InitUtils {
 			builder.append("<td>").append("\r\n");
 			builder.append("<div class=\"am-btn-toolbar\">").append("\r\n");
 			builder.append("<div class=\"am-btn-group am-btn-group-xs\">").append("\r\n");
-			builder.append("<button type=\"button\" class=\"am-btn am-btn-default am-btn-xs am-text-secondary\"              onclick=\"myConfig.page.edit('${path}/"+this.name+"/toEdit"+this.Name+".action?"+this.name+".id=${row.id}&pager.num=${map.pager.num}&pmenu=${param.pmenu }')\"> <span class=\"am-icon-pencil-square-o\"></span> 编辑 </button>").append("\r\n");
-			builder.append("<button type=\"button\" class=\"am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only\" onclick=\"myConfig.page.edit('${path}/"+this.name+"/delete"+this.Name+".action?"+this.name+".id=${row.id}&pager.num=${map.pager.num}&pmenu=${param.pmenu }')\" ><span class=\"am-icon-trash-o\">        </span> 删除</button>").append("\r\n");
+			builder.append("<button type=\"button\" class=\"am-btn am-btn-default am-btn-xs am-text-secondary\"              onclick=\"myConfig.page.edit('${path}/"+this.lowerName+"/toEdit"+this.Name+".action?"+this.name+".id=${row.id}&pager.num=${map.pager.num}&pmenu=${param.pmenu }')\"> <span class=\"am-icon-pencil-square-o\"></span> 编辑 </button>").append("\r\n");
+			builder.append("<button type=\"button\" class=\"am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only\" onclick=\"myConfig.page.edit('${path}/"+this.lowerName+"/delete"+this.Name+".action?"+this.name+".id=${row.id}&pager.num=${map.pager.num}&pmenu=${param.pmenu }')\" ><span class=\"am-icon-trash-o\">        </span> 删除</button>").append("\r\n");
 			builder.append("</div>").append("\r\n");
 			builder.append("</div>").append("\r\n");
 			builder.append("</td>").append("\r\n");
@@ -1136,10 +1136,10 @@ public class InitUtils {
 			builder.append("共 ${map.pager.rowCount} 条记录").append("\r\n");
 			builder.append("<div class=\"am-fr\">").append("\r\n");
 			builder.append("<ul class=\"am-pagination\">").append("\r\n");
-			builder.append("<li><a href=\"javascript:void(0)\" onclick=\"myConfig.page.go('${path}/"+this.name+"/toQuery"+this.Name+"','1','${param.pmenu }');\"                  >第一页</a></li>").append("\r\n");
-			builder.append("<li><a href=\"javascript:void(0)\" onclick=\"myConfig.page.go('${path}/"+this.name+"/toQuery"+this.Name+"','${map.pager.prev}','${param.pmenu }');\"  >上一页</a></li>").append("\r\n");
-			builder.append("<li><a href=\"javascript:void(0)\" onclick=\"myConfig.page.go('${path}/"+this.name+"/toQuery"+this.Name+"','${map.pager.next}','${param.pmenu }');\"  >下一页</a></li>").append("\r\n");
-			builder.append("<li><a href=\"javascript:void(0)\" onclick=\"myConfig.page.go('${path}/"+this.name+"/toQuery"+this.Name+"','${map.pager.count}','${param.pmenu }');\" >最末页</a></li>").append("\r\n");
+			builder.append("<li><a href=\"javascript:void(0)\" onclick=\"myConfig.page.go('${path}/"+this.lowerName+"/toQuery"+this.Name+"','1','${param.pmenu }');\"                  >第一页</a></li>").append("\r\n");
+			builder.append("<li><a href=\"javascript:void(0)\" onclick=\"myConfig.page.go('${path}/"+this.lowerName+"/toQuery"+this.Name+"','${map.pager.prev}','${param.pmenu }');\"  >上一页</a></li>").append("\r\n");
+			builder.append("<li><a href=\"javascript:void(0)\" onclick=\"myConfig.page.go('${path}/"+this.lowerName+"/toQuery"+this.Name+"','${map.pager.next}','${param.pmenu }');\"  >下一页</a></li>").append("\r\n");
+			builder.append("<li><a href=\"javascript:void(0)\" onclick=\"myConfig.page.go('${path}/"+this.lowerName+"/toQuery"+this.Name+"','${map.pager.count}','${param.pmenu }');\" >最末页</a></li>").append("\r\n");
 			builder.append("</ul>").append("\r\n");
 			builder.append("</div>").append("\r\n");
 			builder.append("</div>").append("\r\n");
