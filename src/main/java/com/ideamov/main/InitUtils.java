@@ -13,6 +13,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.xml.sax.SAXException;
 
 import com.ideamov.utils.CharUtil;
 
@@ -49,7 +50,7 @@ public class InitUtils {
 
 	private List<String> fieldTyep; // 类属性类型
 
-	public InitUtils(Class clazz,String classHbmXmlUrl) throws IOException, ClassNotFoundException, DocumentException {
+	public InitUtils(Class clazz,String classHbmXmlUrl) throws IOException, ClassNotFoundException, DocumentException, SAXException {
          
 		this.clazz = clazz; //得到类反射
 
@@ -759,7 +760,7 @@ public class InitUtils {
 
 	}
 
-	private void DataInit(String classHbmXmlUrl) throws DocumentException {
+	private void DataInit(String classHbmXmlUrl) throws DocumentException, SAXException {
 
 		Name = clazz.getSimpleName();//类名
 
@@ -779,7 +780,18 @@ public class InitUtils {
 			if ("serialVersionUID".equals(field.getName())) {
 				continue;
 			}
+			List<String> noInclude = new ArrayList<String>();
 
+			noInclude.add("String");
+			noInclude.add("Double");
+			noInclude.add("Integer");
+			noInclude.add("Date");
+			//过滤pojo类属性
+			if(!noInclude.contains(field.getType().getSimpleName()))
+			{
+				continue;
+			}
+			
 			fieldEN.add(field.getName());
 			fieldTyep.add(field.getType().getSimpleName());
 
@@ -820,6 +832,7 @@ public class InitUtils {
 			fieldLength.add("32");
 		//1 创建解析器,加载文档对象
 		  SAXReader reader = new SAXReader();
+		  reader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 	       Document document = reader.read(new File(classHbmXmlUrl));
 		//2 获得根元素
 	      Element hibernateMappingElement = 	document.getRootElement();
