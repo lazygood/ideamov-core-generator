@@ -552,6 +552,37 @@ public class InitUtils {
 		
 		BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
 		
+		
+		
+		
+		// select
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < fieldEN.size(); i++) {
+			// Type(String Double Integer Type )>Dn
+			// 如果类属性命名为id 隐藏
+			String T = fieldTyep.get(i);// java类型
+			String EN = fieldEN.get(i);// 英文名
+		    String EB_FirstUp = 	EN.substring(0,1).toUpperCase()+EN.substring(1,EN.length());
+			 
+			if ("String".equals(T)) {
+              sb.append("if (StringUtils.isNotBlank(queryModel.get"+EB_FirstUp+"())) { super.hql.append(\" and o."+EN+" like  ? \"); super.argValues.add(\"%\"+queryModel.get"+EB_FirstUp+"()+\"%\");}\r\n");
+			} else if ("Integer".equals(T)) {
+              sb.append("if (queryModel.get"+EB_FirstUp+"()!=null) { super.hql.append(\" and o."+EN+" =  ? \"); super.argValues.add(queryModel.get"+EB_FirstUp+"());}\r\n");
+			} else if ("Date".equals(T)) {
+			 /* 
+			  sb.append("if (queryModel.get"+EB_FirstUp+"Begin() != null)   { super.hql.append(\" and o."+EN+" >= '\"+queryModel.getTimeCreateBegin()+\" 00:00:00' \"); }\"");
+			  sb.append("if (queryModel.get"+EB_FirstUp+"End()   != null)   { super.hql.append(\" and o."+EN+" <= '\"+queryModel.getTimeCreateBegin()+\" 23:59:59' \"); }\"");*/
+		      sb.append("if (StringUtils.isNotBlank(queryModel.get"+EB_FirstUp+"Begin())) {  super.hql.append(\" and o."+EN+" >= '\"+queryModel.get"+EB_FirstUp+"Begin()+\" 00:00:00' \"); }\r\n");
+		      sb.append("if (StringUtils.isNotBlank(queryModel.get"+EB_FirstUp+"End()))   {  super.hql.append(\" and o."+EN+" <= '\"+queryModel.get"+EB_FirstUp+"End()+\" 23:59:59' \"); }\r\n");
+			
+			} else if ("Double".equals(T)) {
+				sb.append("if (queryModel.get"+EB_FirstUp+"()!=null) { super.hql.append(\" and o."+EN+" =  ? \"); super.argValues.add(queryModel.get"+EB_FirstUp+"());}\r\n");
+			} else {
+
+			}
+		}
+		
+		
 		bufferedWriter.write(
 				 "package "+packageName+";\r\n"+
 		         "import "+this.packageName+"."+Name+";\r\n"+
@@ -574,9 +605,10 @@ public class InitUtils {
 		         ""+this.Name+" queryModel = ("+this.Name+") o;\r\n"+
 		         "\r\n"+
 		         "if (queryModel != null) {\r\n"+
+		         "\r\n"+ sb.toString()+
 		         "\r\n"+
-		         "if (StringUtils.isNotBlank(queryModel.getId())) { super.hql.append(\" and o.id =  ? \"); super.argValues.add(queryModel.getId());}\r\n"+
 		         "\r\n"+
+                 "\r\n"+
 		         "}\r\n"+
 		         "\r\n"+
 		         "if (null != sorters) {\r\n"+
@@ -589,11 +621,10 @@ public class InitUtils {
 		         "\r\n"+
 		         "\r\n"+
 		          "}"); 
-				
-				
-				bufferedWriter.flush();
-				bufferedWriter.close();
 		
+		bufferedWriter.flush();
+		bufferedWriter.close();		
+ 
 	}
 
 	private void generatorDao(String directoryName) throws IOException {
@@ -936,51 +967,67 @@ public class InitUtils {
 				
 			    if("String".equals(T))
 			    {
-				      //如果为id(主键)隐藏文本框
+				      //0.如果为id(主键)隐藏文本框
 					  if("id".equals(EN))
 					  {
-						  builder.append("<div style=\"display: none;\"  class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+EN+" </label><div class=\"am-u-sm-9\"><input type=\"text\"   name=\""+this.name+"."+EN+"\" placeholder=\"\"  value=\"${"+this.name+"."+EN+"}\"  ></div></div>").append("\r\n");  
+						  builder.append("<div style=\"display: none;\"  class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+EN+" </label><div class=\"am-u-sm-9\" style=\"margin-top: 5px;\"><input type=\"text\"   name=\""+this.name+"."+EN+"\" placeholder=\"\"  value=\"${"+this.name+"."+EN+"}\"  ></div></div>").append("\r\n");  
 					  }
-					  //如果数据库字段命名包含_text引入富文本编辑器
+					  //1.如果数据库字段命名包含_text引入富文本编辑器
 					  else if(fieldDN.get(i).lastIndexOf("_text")>-1)
 					  {
-						  Text.add(this.name+"_"+EN);
-						  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\"> <textarea rows=\"10\" id=\""+this.name+"_"+EN+"\"  name=\""+this.name+"."+EN+"\" style=\"style=\"width: 105%;height: 300px\"\" > ${"+this.name+"."+EN+"} </textarea> </div></div>").append("\r\n");
+						  Text.add(this.name+"_"+EN);  //通知下边代码加上富文本编辑器
+						  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\" style=\"margin-top: 5px;\"> <textarea rows=\"10\" id=\""+this.name+"_"+EN+"\"  name=\""+this.name+"."+EN+"\" style=\"style=\"width: 105%;height: 300px\"\" > ${"+this.name+"."+EN+"} </textarea> </div></div>").append("\r\n");
 					  }
-					  //如果数据库字段命名包含_url引入文件上传插件
+					  //2.如果数据库字段命名包含_url引入文件上传插件
 					  else if(fieldDN.get(i).lastIndexOf("_url")>-1)
 					  {
-						  File.add(this.name+"_"+EN);
-						  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\">  <input id=\"up_"+this.name+"_"+EN+"\" type=\"file\" name=\"file\" class=\"am-input-sm\" accept=\".jpg,.png\" style=\"margin-top: 11px;\" form=\"upFrom_"+this.name+"_"+EN+"\"> <input id=\"upInput_"+this.name+"_"+EN+"\" type=\"hidden\" name=\""+this.name+"."+EN+"\" value=\"${"+this.name+"."+EN+"}\"> </div></div>").append("\r\n");
-						  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\"> </label><div class=\"am-u-sm-9\">  <img id=\"upImage_"+this.name+"_"+EN+"\" style=\"width: 300px; height: 200px\" src=\"${"+this.name+"."+EN+"}\" alt=\"无图片显示\"> </div></div>").append("\r\n");
+						  File.add(this.name+"_"+EN);  //通知下边代码加上文件上传插件
+						  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\" style=\"margin-top: 5px;\">  <input id=\"up_"+this.name+"_"+EN+"\" type=\"file\" name=\"file\" class=\"am-input-sm\" accept=\".jpg,.png\" style=\"margin-top: 11px;\" form=\"upFrom_"+this.name+"_"+EN+"\"> <input id=\"upInput_"+this.name+"_"+EN+"\" type=\"hidden\" name=\""+this.name+"."+EN+"\" value=\"${"+this.name+"."+EN+"}\"> </div></div>").append("\r\n");
+						  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\"> </label><div class=\"am-u-sm-9\" style=\"margin-top: 5px;\">  <img id=\"upImage_"+this.name+"_"+EN+"\" style=\"width: 300px; height: 200px\" src=\"${"+this.name+"."+EN+"}\" alt=\"无图片显示\"> </div></div>").append("\r\n");
 					  }
 					  else
 					  {
-					  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\"><input type=\"text\"   name=\""+this.name+"."+EN+"\" placeholder=\"\"  value=\"${"+this.name+"."+EN+"}\" maxlength=\""+DS+"\" required ></div></div>").append("\r\n");
+					      builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\" style=\"margin-top: 5px;\"><input type=\"text\"   name=\""+this.name+"."+EN+"\" placeholder=\"\"  value=\"${"+this.name+"."+EN+"}\" maxlength=\""+DS+"\" required ></div></div>").append("\r\n");
 					  }
-			    }else if ("Integer".equals(T))
+			    }
+			    else if ("Integer".equals(T))
 			    {
 					  //如果是数据字典引入标签
 					  if(fieldDN.get(i).lastIndexOf("_state")>-1||fieldDN.get(i).lastIndexOf("_type")>-1)
 					  {
-					  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\">    <ideamov:select  code=\""+DN.toUpperCase()+"\"  name=\""+this.name+"."+EN+"\" key=\"${"+this.name+"."+EN+"}\" /> </div></div>").append("\r\n");
+					  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\" style=\"margin-top: 5px;\">    <ideamov:select  code=\""+DN.toUpperCase()+"\"  name=\""+this.name+"."+EN+"\" key=\"${"+this.name+"."+EN+"}\" /> </div></div>").append("\r\n");
 					  }
 					  //如果是普通数值
 					  else
 					  {
-				      builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\"><input type=\"text\"   name=\""+this.name+"."+EN+"\" placeholder=\"\"  value=\"${"+this.name+"."+EN+"}\"    pattern=\"^\\d{1,"+DS+"}$\" maxlength=\""+fieldLength.get(i)+"\" required ></div></div>").append("\r\n");
+				      builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\" style=\"margin-top: 5px;\"><input type=\"text\"   name=\""+this.name+"."+EN+"\" placeholder=\"\"  value=\"${"+this.name+"."+EN+"}\"    pattern=\"^\\d{1,"+DS+"}$\" maxlength=\""+fieldLength.get(i)+"\" required ></div></div>").append("\r\n");
 					  }
-			    }else if ("Date".equals(T))
+			    }
+			    else if ("Date".equals(T))
 			    {
 					  //如果数据库字段命名为create_time编辑页面不显示
 					  if(!"create_time".equals(DN))
 					  {
-					  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+CN+" </label><div class=\"am-u-sm-9\"><input type=\"text\"   name=\""+this.name+"."+EN+"\" placeholder=\"\"  value=\"<fmt:formatDate value=\"${"+this.name+"."+EN+"}\" pattern=\"yyyy-MM-dd\"/>\" data-am-datepicker readonly required ></div></div>").append("\r\n");  
+					  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+CN+" </label><div class=\"am-u-sm-9\" style=\"margin-top: 5px;\"><input type=\"text\"   name=\""+this.name+"."+EN+"\" placeholder=\"\"  value=\"<fmt:formatDate value=\"${"+this.name+"."+EN+"}\" pattern=\"yyyy-MM-dd\"/>\" data-am-datepicker readonly required ></div></div>").append("\r\n");  
 					  }
-			    }else if ("Double".equals(T))
-			    {
-			    	  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\"><input type=\"text\"   name=\""+this.name+"."+EN+"\" placeholder=\"\"  value=\"${"+this.name+"."+EN+"}\" maxlength=\""+DS+"\" required ></div></div>").append("\r\n");
 			    }
+			    else if ("Double".equals(T))
+			    {
+					 //3.如果数据库字段命名包含gd_lng||gd_lat引入地图定位控件
+					 if(fieldDN.get(i).lastIndexOf("gd_lng")>-1)
+					  {
+						  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\" style=\"margin-top: 5px;\"><input type=\"text\"   name=\""+this.name+"."+EN+"\" placeholder=\"\"  value=\"${"+this.name+"."+EN+"}\" maxlength=\""+DS+"\" id=\"lng\" placeholder=\"点击地图获取坐标\" readonly></div></div>").append("\r\n");
+					  }
+					  else if(fieldDN.get(i).lastIndexOf("gd_lat")>-1)
+					  {
+						  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\" style=\"margin-top: 5px;\"><input type=\"text\"   name=\""+this.name+"."+EN+"\" placeholder=\"\"  value=\"${"+this.name+"."+EN+"}\" maxlength=\""+DS+"\" id=\"lag\" placeholder=\"点击地图获取坐标\" readonly></div></div>").append("\r\n");
+						  builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">坐标定位 </label><iframe src=\"${path }/mapSpot.jsp\" style=\"width:685px;height: 400px;margin-left:27%;float: left;\" id=\"map\"></iframe></div>");
+					  }
+					  else
+					  {
+			    	      builder.append("<div class=\"am-form-group\"> <label for=\"user-name\" class=\"am-u-sm-3 am-form-label\">"+fieldCN.get(i)+" </label><div class=\"am-u-sm-9\" style=\"margin-top: 5px;\"><input type=\"text\"   name=\""+this.name+"."+EN+"\" placeholder=\"\"  value=\"${"+this.name+"."+EN+"}\"  pattern=\"^\\d+(\\.\\d{1,6})?$\" maxlength=\""+DS+"\" required ></div></div>").append("\r\n");
+					  }
+				}
 			    else
 			    {
 				   
@@ -1069,30 +1116,31 @@ public class InitUtils {
 			builder.append("").append("\r\n");
 			builder.append("<hr>").append("\r\n");
 			builder.append("").append("\r\n");
-			builder.append("<div class=\"am-g\">").append("\r\n");
 			builder.append("<form id=\"myForm\"  method=\"post\" >").append("\r\n");
-			builder.append("<div class=\"am-u-sm-12 am-u-md-7\">").append("\r\n");
-			builder.append("<div class=\"am-btn-toolbar\">").append("\r\n");
+			builder.append("<div class=\"am-g\">").append("\r\n");
+			builder.append("<div class=\"am-u-sm-12 am-u-md-1\">").append("\r\n");
+	 
+			builder.append("<div class=\"am-btn-toolbar\">");
 			builder.append("<div class=\"am-btn-group am-btn-group-xs\">").append("\r\n");
-			builder.append("<button  type=\"button\"  class=\"am-btn am-btn-default\" onclick=\"myConfig.page.edit('${path}/"+this.lowerName+"/toEdit"+this.Name+".action?"+this.name+".id=${row.id}&pager.num=${map.pager.num}&pmenu=${param.pmenu }')\" ><span class=\"am-icon-plus\"></span>新增</button>").append("\r\n");
+			builder.append(" <button  type=\"button\"  class=\"am-btn am-btn-default\" onclick=\"myConfig.page.edit('${path}/"+this.lowerName+"/toEdit"+this.Name+".action?"+this.name+".id=${row.id}&pager.num=${map.pager.num}&pmenu=${param.pmenu}&cmenu=${param.cmenu}')\" ><span class=\"am-icon-plus\"></span>新增</button>").append("\r\n");
 			builder.append("</div>").append("\r\n");
-			builder.append("</div>").append("\r\n");
+			builder.append("</div>");
+			
 			builder.append("</div>").append("\r\n");
 			builder.append("").append("\r\n");
 			builder.append("<div class=\"am-u-sm-12 am-u-md-3\">").append("\r\n");
 			builder.append("<div class=\"am-input-group am-input-group-sm\">").append("\r\n");
-			builder.append("<input type=\"text\" name="+this.name+".id\" class=\"am-form-field\" placeholder=\"id查询\" value=\"${"+this.name+".id }\" >").append("\r\n");
-			builder.append("<span class=\"am-input-group-btn\"> <button class=\"am-btn am-btn-default\" type=\"button\" onclick=\"myConfig.page.go('${path}/"+this.lowerName+"/toQuery"+this.Name+"','1','${param.pmenu }');\" >搜索</button> <button class=\"am-btn am-btn-default\" type=\"button\" onclick=\"myConfig.page.import('${path}/"+this.lowerName+"/export"+this.Name+"');\">导出</button></span>").append("\r\n");
+			builder.append("<input type=\"text\" name=\""+this.name+".id\" class=\"am-form-field\" placeholder=\"id查询\" value=\"${"+this.name+".id }\"><span class=\"am-input-group-btn\"> <button class=\"am-btn am-btn-default\" type=\"button\" onclick=\"myConfig.page.go('${path}/"+this.lowerName+"/toQuery"+this.Name+"','1','${param.pmenu}','${param.cmenu}');\" >搜索</button> <button class=\"am-btn am-btn-default\" type=\"button\" onclick=\"myConfig.page.import('${path}/"+this.lowerName+"/export"+this.Name+"');\">导出</button></span>").append("\r\n");
+			builder.append("</div>").append("\r\n");
 			builder.append("</div>").append("\r\n");
 			builder.append("</div>").append("\r\n");
 			builder.append("</form>").append("\r\n");
-			builder.append("</div>").append("\r\n");
 			builder.append("").append("\r\n");
 			
 			builder.append("<div class=\"am-g\">").append("\r\n");
 			builder.append("<div class=\"am-u-sm-12\">").append("\r\n");
 			builder.append("<form class=\"am-form\">").append("\r\n");
-			builder.append("<table class=\"am-table am-table-striped am-table-hover table-main\">").append("\r\n");
+			builder.append("<table class=\"am-table am-table-bd am-table-bdrs am-table-striped am-table-hover\">").append("\r\n");
 			builder.append("<thead>").append("\r\n");
 			builder.append("<tr>").append("\r\n");
 			
@@ -1134,9 +1182,9 @@ public class InitUtils {
 			
 			builder.append("<td>").append("\r\n");
 			builder.append("<div class=\"am-btn-toolbar\">").append("\r\n");
-			builder.append("<div class=\"am-btn-group am-btn-group-xs\">").append("\r\n");
-			builder.append("<button type=\"button\" class=\"am-btn am-btn-default am-btn-xs am-text-secondary\"              onclick=\"myConfig.page.edit('${path}/"+this.lowerName+"/toEdit"+this.Name+".action?"+this.name+".id=${row.id}&pager.num=${map.pager.num}&pmenu=${param.pmenu }')\"> <span class=\"am-icon-pencil-square-o\"></span> 编辑 </button>").append("\r\n");
-			builder.append("<button type=\"button\" class=\"am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only\" onclick=\"myConfig.page.edit('${path}/"+this.lowerName+"/delete"+this.Name+".action?"+this.name+".id=${row.id}&pager.num=${map.pager.num}&pmenu=${param.pmenu }')\" ><span class=\"am-icon-trash-o\">        </span> 删除</button>").append("\r\n");
+			builder.append("<div class=\"am-btn-group-xs\">").append("\r\n");
+			builder.append("<button type=\"button\" class=\"am-btn am-btn-secondary am-round\"              onclick=\"myConfig.page.edit('${path}/"+this.lowerName+"/toEdit"+this.Name+".action?"+this.name+".id=${row.id}&pager.num=${map.pager.num}&pmenu=${param.pmenu}&cmenu=${param.cmenu}')\"> <span class=\"am-icon-pencil-square-o\"></span> 编辑 </button>").append("\r\n");
+			builder.append("<button type=\"button\" class=\"am-btn am-btn-danger am-round\" onclick=\"myConfig.page.edit('${path}/"+this.lowerName+"/delete"+this.Name+".action?"+this.name+".id=${row.id}&pager.num=${map.pager.num}&pmenu=${param.pmenu}&cmenu=${param.cmenu}')\"> <span class=\"am-icon-trash-o\">        </span> 删除</button>").append("\r\n");
 			builder.append("</div>").append("\r\n");
 			builder.append("</div>").append("\r\n");
 			builder.append("</td>").append("\r\n");
@@ -1149,10 +1197,10 @@ public class InitUtils {
 			builder.append("共 ${map.pager.rowCount} 条记录").append("\r\n");
 			builder.append("<div class=\"am-fr\">").append("\r\n");
 			builder.append("<ul class=\"am-pagination\">").append("\r\n");
-			builder.append("<li><a href=\"javascript:void(0)\" onclick=\"myConfig.page.go('${path}/"+this.lowerName+"/toQuery"+this.Name+"','1','${param.pmenu }');\"                  >第一页</a></li>").append("\r\n");
-			builder.append("<li><a href=\"javascript:void(0)\" onclick=\"myConfig.page.go('${path}/"+this.lowerName+"/toQuery"+this.Name+"','${map.pager.prev}','${param.pmenu }');\"  >上一页</a></li>").append("\r\n");
-			builder.append("<li><a href=\"javascript:void(0)\" onclick=\"myConfig.page.go('${path}/"+this.lowerName+"/toQuery"+this.Name+"','${map.pager.next}','${param.pmenu }');\"  >下一页</a></li>").append("\r\n");
-			builder.append("<li><a href=\"javascript:void(0)\" onclick=\"myConfig.page.go('${path}/"+this.lowerName+"/toQuery"+this.Name+"','${map.pager.count}','${param.pmenu }');\" >最末页</a></li>").append("\r\n");
+			builder.append("<li><a href=\"javascript:void(0)\" onclick=\"myConfig.page.go('${path}/"+this.lowerName+"/toQuery"+this.Name+"','1','${param.pmenu}','${param.cmenu}');\"                  >第一页</a></li>").append("\r\n");
+			builder.append("<li><a href=\"javascript:void(0)\" onclick=\"myConfig.page.go('${path}/"+this.lowerName+"/toQuery"+this.Name+"','${map.pager.prev}','${param.pmenu}','${param.cmenu}');\"  >上一页</a></li>").append("\r\n");
+			builder.append("<li><a href=\"javascript:void(0)\" onclick=\"myConfig.page.go('${path}/"+this.lowerName+"/toQuery"+this.Name+"','${map.pager.next}','${param.pmenu}','${param.cmenu}');\"  >下一页</a></li>").append("\r\n");
+			builder.append("<li><a href=\"javascript:void(0)\" onclick=\"myConfig.page.go('${path}/"+this.lowerName+"/toQuery"+this.Name+"','${map.pager.count}','${param.pmenu}','${param.cmenu}');\" >最末页</a></li>").append("\r\n");
 			builder.append("</ul>").append("\r\n");
 			builder.append("</div>").append("\r\n");
 			builder.append("</div>").append("\r\n");
